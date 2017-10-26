@@ -1,11 +1,9 @@
 // import app here and start the server. Import from routes.js, not server.js (if we can make it work like that)
 
 const PORT = process.env.PORT || 3000;
+const app = require('./lib/routes.js');
 
-require("./lib/server").listen(PORT, function(){
-  console.log('Server is running on 3000!');
+console.log(app);
+app.listen(PORT, () => {
+  console.log(`Server is live on port: ${PORT}`);
 });
-
-// app.listen(PORT, function() {
-//   console.log('Server is running on 3000!');
-// });
