@@ -8,11 +8,6 @@ const server = app.listen(3000);
 
 describe('Testing for GET', () => {
 
-  after((done) => {
-    server.close();
-    done();
-  });
-
   it('should send an error if note is not found', (done) => {
     request.get('localhost:3000/api/notes/123').end(function(err, res) {
       expect(res.text).toEqual('Note not found');
