@@ -3,82 +3,55 @@ const routes = require('..lib/routes.js');
 const server = require('..lib/server.js');
 const express = require('express');
 
-// GET /lib/note?uuid= get note by uuid
-  // 404 if note is not found
-  // 400 if no id was sent
-  // 200 if note found.
-describe('Testing for GET'), () => {
-  before((done) => {
-    server.start(process.env.PORT || 3000);
-    done();
+describe('Testing for GET', () => {
+
+  it('should send an error if note is not found', (done) => {
+    request.get('localhost:3000/api/notes/123').end(function(err, res) {
+      expect(res.text).toEqual('Note not found');
+      done();
+    });
+  });
+  it('should send the note when correct id is presented', (done) => {
+    request.get('localhost:3000/api/notes/David').end(function(err, res) {
+      expect(res.text).toEqual('sucks');
+      done();
+    });
+  });
+  it('should send an error if you do not send an id', (done) => {
+    request.get('localhost:3000/api/notes/').end(function(err, res) {
+      expect(res.text).toEqual('You did not send an id');
+      done();
+    });
   });
 
-  after(done) => {
-    server.stop();
-    done();
-  });
-
-// GET /lib/note?uuid= get note by uuid
-  it('GET /lib/note no note is found')
-    request.get('localhost:3000/lib/note/?uuid=234').end(err, res) => {
-      // 404 if note is not found
-      if(res.status == 404)
-        expect(res.text).toEqual('You do not have any notes');
-      } else {
-      expect(res.text).toEqual('Added note.');
-      } done();
-
-  it('GET /lib/note if no id was sent')
-    request.get('localhost:3000/lib/note/?uuid=234').end(err, res) => {
-      // 400 if no id was sent
-      if(res.status == 400)
-        expect(res.text).toEqual('Bad request: You do not have an id');
-      } else {
-      expect(res.text).toEqual('id found.');
-      } done();
-
-  it('GET /lib/note if note found')
-    request.get('localhost:3000/lib/note/?uuid=234').end(err, res) => {
-      // 200 if note found.
-      if(res.status == 200)
-        expect(res.text).toEqual('Note found.');
-      } else {
-      expect(res.text).toEqual('Bad request: Note not found');
-      } done();
 });
 
-// POST /api/notes save new note w/ post body
-  // 400 if no body was found or body was invalid
-  // 200 if body was valid
-describe('Testing for POST'), () => {
-  before((done) => {
-    server.start(process.env.PORT || 3000);
+
+describe('Testing for POST', () => {
+  after((done) => {
+    server.close();
     done();
   });
 
-  after(done) => {
-    server.stop();
-    done();
+  it('should create a note when body content is passed like body=content', (done) => {
+    request.post('localhost:3000/api/notes', { body: 'hello' }, function(err, res) {
+      expect(res.text).toEqual('Note created');
+      done();
+    });
   });
 
-// POST /lib/note save new note w/ post body
-  it('POST /lib/note if no body was found or body was invalid')
-    request.post('localhost:3000/lib/note/:id').end(err, res) => {
-      // 400 if no body was found or body was invalid
-      //test 400, it should respond with 'bad request' if no request body was provided or the body was invalid
-      if(res.status == 400)
-        expect(res.text).toEqual('Bad request: No body found or body invalid');
-      } else {
-        expect(res.text).toEqual('Thanks for your post.');
-      } done();
+  it('should asked user to include body content if none was provided', (done) => {
+    request.post('localhost:3000/api/notes', { body: '' }, function(err, res) {
+      expect(res.text).toEqual("Please submit content alongside body=");
+      done();
+    });
+  });
 
-  it('POST /lib/note if body was valid')
-    request.post('localhost:3000/lib/note/:id').end(err, res) => {
-      // 200 if body was valid
-      // test 200, it should respond with the body content for a post request with a valid body
-      if(res.status == 200)
-        expect(res.text).toEqual(`Post receieved. ${'req.body'}`);
-      } else {
-        expect(res.text).toEqual('Bad request: Body invalid');
-      } done();
+  it('should tell user to actuall post something if they do not', (done) => {
+    request.post('localhost:3000/api/notes', {}, function(err, res) {
+      expect(res.text).toEqual('You did not post a body in your request. Please submit as \"body=\"');
+      done();
+    });
+  });
+
 });
